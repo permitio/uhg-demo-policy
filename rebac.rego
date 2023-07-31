@@ -1,7 +1,6 @@
 package permit.rebac
 
 import data.permit.rbac
-import data.permit.utils
 import future.keywords.in
 
 __rebac_data := {
@@ -12,12 +11,10 @@ __rebac_data := {
 
 default rebac_roles := []
 
-rebac_roles_result := {
-  "roles": [],
-  "debugger": {
-    "error": "Connected PDPs do not not support ReBAC, try to update your pdp version"
-  }
-}
+default cache_rebuild := false
+
+rebac_roles_result := permit_rebac_roles(__rebac_data, input)
+
 
 rebac_roles := rebac_roles_result.roles
 
@@ -43,8 +40,12 @@ allowing_roles[role_key] {
 	rbac.allowing_roles[role_key] with data.users as scoped_users_obj with data.roles_resource as input.resource.type
 }
 
+object_keys(obj) := result {
+	result := [key | some key, value in obj]
+}
+
 default activated := false
 
 activated {
-	count(utils.object_keys(data.relationships)) > 0
+	count(object_keys(data.relationships)) > 0
 }
