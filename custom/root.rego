@@ -50,6 +50,6 @@ enforce_boundries(resource) {
 	print("Time now: ", time.now_ns())
 	print("Start date: ", time.parse_rfc3339_ns(abac.attributes.user.caregiver_bounds[resource].start_date))
 	print("End date: ", time.parse_rfc3339_ns(abac.attributes.user.caregiver_bounds[resource].end_date))
-	time.parse_rfc3339_ns(abac.attributes.user.caregiver_bounds[resource].start_date) >= time.now_ns()
-	time.parse_rfc3339_ns(abac.attributes.user.caregiver_bounds[resource].end_date) <= time.now_ns()
+	time.parse_rfc3339_ns(abac.attributes.user.caregiver_bounds[resource].start_date) <= time.now_ns()
+	time.parse_rfc3339_ns(abac.attributes.user.caregiver_bounds[resource].end_date) >= time.now_ns()
 }
