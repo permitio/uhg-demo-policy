@@ -9,7 +9,7 @@ default allow := false
 
 # Ignore the date check if there is no ReBac
 allow {
-	not rebac in policies.__allow_sources
+	not "rebac" in policies.__allow_sources
 } else {
 	count(filter_resource) == 0
 } else {
