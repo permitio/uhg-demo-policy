@@ -23,6 +23,8 @@ allow {
 }
 
 filter_resource[derived_resource] {
+	print("Derived resource")
+	print(rebac.rebac_roles_debugger.allowing_roles)
 	some allowing_role in rebac.rebac_roles_debugger.allowing_roles
 	print(allowing_role)
 	some source in allowing_role.sources
