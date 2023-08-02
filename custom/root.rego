@@ -35,7 +35,7 @@ exctract_resouce(allowing_role, source) := returned_resource {
 	print("Role assignment - Caregiver role after endswith")
 	returned_resource := allowing_role.resource
 	print("Role assignment - returned resource: ", returned_resource)
-} else {
+} else := returned_resource {
 	source.type == "role_derivation"
 	print("Role derivation - role: ", source.role)
 	endswith(source.role, "#caregiver")
