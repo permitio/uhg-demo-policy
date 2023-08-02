@@ -47,10 +47,8 @@ exctract_resouce(allowing_role, source) := returned_resource {
 
 enforce_boundries(resource) {
 	print("Enforce boundries")
-	print("User", abac.attributes.user)
-	print("User caregiver bounds", abac.attributes.user.caregiver_bounds)
-	print("User caregiver bounds resource", abac.attributes.user.caregiver_bounds[resource])
-	print("Resource", resource)
+	print("Start date: ", abac.attributes.user.caregiver_bounds[resource].start_date)
+	print("End date: ", abac.attributes.user.caregiver_bounds[resource].end_date)
 	time.parse_rfc3339_ns(abac.attributes.user.caregiver_bounds[resource].start_date) >= time.now_ns()
 	time.parse_rfc3339_ns(abac.attributes.user.caregiver_bounds[resource].end_date) <= time.now_ns()
 }
