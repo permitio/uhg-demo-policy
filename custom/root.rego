@@ -35,6 +35,7 @@ exctract_resouce(allowing_role, source) := returned_resource {
 	source.type == "role_assignment"
 	print("Role assignment - role: ", allowing_role.role)
 	endswith(allowing_role.role, "#caregiver")
+	not startswith(allowing_role.role, "profile")
 	print("Role assignment - Caregiver role after endswith")
 	returned_resource := allowing_role.resource
 	print("Role assignment - returned resource: ", returned_resource)
@@ -42,6 +43,7 @@ exctract_resouce(allowing_role, source) := returned_resource {
 	source.type == "role_derivation"
 	print("Role derivation - role: ", source.role)
 	endswith(source.role, "#caregiver")
+	not startswith(allowing_role.role, "profile")
 	print("Role derivation - Caregiver role after endswith")
 	returned_resource := source.resource
 	print("Role derivation - returned resource: ", returned_resource)
