@@ -38,6 +38,6 @@ exctract_resouce(source, role, resource) := returned_resource {
 }
 
 enforce_boundries(resource) {
-	parse_time(abac.attributes.user.caregiver_bounds[resource].start_date) >= parse_time(time.now_ns())
-	parse_time(abac.attributes.user.caregiver_bounds[resource].end_date) <= parse_time(time.now_ns())
+	parse_time(abac.attributes.user.caregiver_bounds[resource].start_date) >= time.date(time.now_ns())
+	parse_time(abac.attributes.user.caregiver_bounds[resource].end_date) <= time.date(time.now_ns())
 }
