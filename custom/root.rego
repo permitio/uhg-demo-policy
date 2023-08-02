@@ -13,19 +13,18 @@ allow {
 	not "rebac" in policies.__allow_sources
 } else {
 	count(filter_resource) == 0
+	print(filter_resource)
 } else {
 	some filtered_resource in filter_resource
-	enforce_boundries(filtered_resource)
 	debug.custom.filtered = filtered_resource
-}
-
-parse_time(time_str) := parsed_time {
-	parsed_time := time.date(time.parse_rfc3339_ns(time_str))
+	enforce_boundries(filtered_resource)
 }
 
 filter_resource[derived_resource] {
 	some allowing_role in rebac.rebac_roles_debugger.allowing_roles
+	print(allowing_role)
 	some source in allowing_role.sources
+	print(source)
 	derived_resource := exctract_resouce(source, allowing_role.role, allowing_role.resource)
 }
 
@@ -40,8 +39,6 @@ exctract_resouce(source, role, resource) := returned_resource {
 }
 
 enforce_boundries(resource) {
-	parse_time(abac.attributes.user.caregiver_bounds[resource].start_date) >= time.date(time.now_ns())
-	parse_time(abac.attributes.user.caregiver_bounds[resource].end_date) <= time.date(time.now_ns())
+	time.parse_rfc3339_ns(abac.attributes.user.caregiver_bounds[resource].start_date) >= time.now_ns()
+	time.parse_rfc3339_ns(abac.attributes.user.caregiver_bounds[resource].end_date) <= time.now_ns()
 }
-
-
