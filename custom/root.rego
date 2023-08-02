@@ -31,17 +31,16 @@ filter_resource[derived_resource] {
 	print("Source type: ", source.type
 	print("Source role: ", source.role)
 	print("Source resource: ", source.resource)
+	endswith(source.role, "#caregiver")
 	derived_resource := exctract_resouce(source, allowing_role.role, allowing_role.resource)
 	print("Derived resource: ", derived_resource)
 }
 
 exctract_resouce(source, role, resource) := returned_resource {
 	source.type == "role_assignment"
-	endswith(source.role, "#caregiver")
 	returned_resource := resource
 } else {
 	source.type == "role_derivation"
-	endswith(source.role, "#caregiver")
 	returned_resource := source.resource
 }
 
