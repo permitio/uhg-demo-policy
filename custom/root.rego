@@ -1,9 +1,11 @@
 package permit.custom
 
 import future.keywords.in
+import permit.debug
 import data.permit.policies
 import data.permit.utils.abac
 import data.permit.rebac
+import data.permit.debug
 
 default allow := false
 
@@ -15,6 +17,7 @@ allow {
 } else {
 	some filtered_resource in filter_resource
 	enforce_boundries(filtered_resource)
+	debug.debug.custom.filtered = filtered_resource
 }
 
 parse_time(time_str) := parsed_time {
@@ -41,3 +44,5 @@ enforce_boundries(resource) {
 	parse_time(abac.attributes.user.caregiver_bounds[resource].start_date) >= time.date(time.now_ns())
 	parse_time(abac.attributes.user.caregiver_bounds[resource].end_date) <= time.date(time.now_ns())
 }
+
+
