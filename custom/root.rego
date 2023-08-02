@@ -1,7 +1,6 @@
 package permit.custom
 
 import future.keywords.in
-import permit.debug
 import data.permit.policies
 import data.permit.utils.abac
 import data.permit.rebac
