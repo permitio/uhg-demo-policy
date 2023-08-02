@@ -28,7 +28,7 @@ filter_resource[derived_resource] {
 	print("Allowing role: ", allowing_role.role)
 	some source in allowing_role.sources
 	print("Source: ", source)
-	print("Source type: ", source.type
+	print("Source type: ", source.type)
 	print("Source role: ", source.role)
 	print("Source resource: ", source.resource)
 	endswith(source.role, "#caregiver")
