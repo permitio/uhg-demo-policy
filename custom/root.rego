@@ -25,11 +25,11 @@ allow {
 filter_resource[derived_resource] {
 	print("Derived resource")
 	some allowing_role in rebac.rebac_roles_debugger
-	print("Allowing role: " + allowing_role.role)
+	print("Allowing role: ", allowing_role.role)
 	some source in allowing_role.sources
-	print("Source: " + source)
+	print("Source: ", source)
 	derived_resource := exctract_resouce(source, allowing_role.role, allowing_role.resource)
-	print("Derived resource: " + derived_resource)
+	print("Derived resource: ", derived_resource)
 }
 
 exctract_resouce(source, role, resource) := returned_resource {
