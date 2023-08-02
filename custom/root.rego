@@ -27,21 +27,24 @@ filter_resource[derived_resource] {
 	some allowing_role in rebac.rebac_roles_debugger
 	print("Allowing role: ", allowing_role.role)
 	some source in allowing_role.sources
-	print("Source: ", source)
-	print("Source type: ", source.type)
-	print("Source role: ", source.role)
-	print("Source resource: ", source.resource)
-	endswith(source.role, "#caregiver")
-	derived_resource := exctract_resouce(source, allowing_role.role, allowing_role.resource)
+	derived_resource := exctract_resouce(allowing_role, source)
 	print("Derived resource: ", derived_resource)
 }
 
-exctract_resouce(source, role, resource) := returned_resource {
+exctract_resouce(allowing_role, source) := returned_resource {
 	source.type == "role_assignment"
-	returned_resource := resource
+	print("Role assignment - role: ", allowing_role.role)
+	endswith(allowing_role.role, "#caregiver")
+	print("Role assignment - Caregiver role after endswith")
+	returned_resource := allowing_role.resource
+	print("Role assignment - returned resource: ", returned_resource)
 } else {
 	source.type == "role_derivation"
+	print("Role derivation - role: ", source.role)
+	endswith(source.role, "#caregiver")
+	print("Role derivation - Caregiver role after endswith")
 	returned_resource := source.resource
+	print("Role derivation - returned resource: ", returned_resource)
 }
 
 enforce_boundries(resource) {
