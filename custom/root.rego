@@ -16,6 +16,8 @@ allow {
 } else {
 	some filtered_resource in filter_resource
 	enforce_boundries(filtered_resource)
+	print("Allowing resource: ", filtered_resource)
+	print("Enforce boundries: ", enforce_boundries(filtered_resource))
 }
 
 filter_resource[derived_resource] {
