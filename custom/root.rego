@@ -11,10 +11,12 @@ default allow := false
 # Ignore the date check if there is no ReBac
 allow {
 	not "rebac" in policies.__allow_sources
+	print("No ReBac")
 } else {
 	count(filter_resource) == 0
-	print(filter_resource)
+	print("No filtered resource")
 } else {
+	print("Filtered resource")
 	some filtered_resource in filter_resource
 	debug.custom.filtered = filtered_resource
 	enforce_boundries(filtered_resource)
