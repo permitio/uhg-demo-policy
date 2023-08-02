@@ -27,7 +27,7 @@ filter_resource[derived_resource] {
 	some allowing_role in rebac.rebac_roles_debugger
 	print("Allowing role: ", allowing_role.role)
 	some source in allowing_role.sources
-	derived_resource := exctract_resouce(allowing_role, source)
+	derived_resource = exctract_resouce(allowing_role, source)
 	print("Derived resource: ", derived_resource)
 }
 
