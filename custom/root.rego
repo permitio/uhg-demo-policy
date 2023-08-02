@@ -11,14 +11,10 @@ default allow := false
 # Ignore the date check if there is no ReBac
 allow {
 	not "rebac" in policies.__allow_sources
-	print("No ReBac")
 } else {
 	count(filter_resource) == 0
-	print("No filtered resource")
 } else {
-	print("Filtered resource")
 	some filtered_resource in filter_resource
-	debug.custom.filtered = filtered_resource
 	enforce_boundries(filtered_resource)
 }
 
@@ -50,6 +46,9 @@ exctract_resouce(allowing_role, source) := returned_resource {
 }
 
 enforce_boundries(resource) {
+	print("Enforce boundries")
+	print("Start date: ", abac.attributes.user.caregiver_bounds[resource].start_date)
+	print("End date: ", abac.attributes.user.caregiver_bounds[resource].end_date)
 	time.parse_rfc3339_ns(abac.attributes.user.caregiver_bounds[resource].start_date) >= time.now_ns()
 	time.parse_rfc3339_ns(abac.attributes.user.caregiver_bounds[resource].end_date) <= time.now_ns()
 }
