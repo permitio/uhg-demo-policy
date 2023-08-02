@@ -16,7 +16,7 @@ allow {
 } else {
 	some filtered_resource in filter_resource
 	enforce_boundries(filtered_resource)
-	debug.debug.custom.filtered = filtered_resource
+	debug.custom.filtered = filtered_resource
 }
 
 parse_time(time_str) := parsed_time {
