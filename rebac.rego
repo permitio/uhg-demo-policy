@@ -13,12 +13,7 @@ default rebac_roles := []
 
 default cache_rebuild := false
 
-rebac_roles_result := {
-  "roles": [],
-  "debugger": {
-    "error": "Connected PDPs do not not support ReBAC, minimum supporting PDP version is 0.2.17-rc.1"
-  }
-}
+rebac_roles_result := permit_rebac_roles(__rebac_data, input)
 
 
 rebac_roles := rebac_roles_result.roles
