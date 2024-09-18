@@ -1,6 +1,9 @@
 package permit.user_permissions
 
 
+import data.permit.abac_user_permissions
+
+
 import future.keywords.in
 
 user := sprintf("user:%s", [input.user.key])
@@ -158,6 +161,7 @@ permissions := result {
 	result := object.union_n([
 		rbac_permissions,
 		rebac_permissions,
+		abac_permissions,
 	])
 }
 
@@ -168,6 +172,12 @@ rbac_permissions := object.union_n([v | v := _rbac_permissions[_]])
 default rebac_permissions := {}
 
 rebac_permissions := object.union_n([v | v := _rebac_permissions[_]])
+
+default abac_permissions := {}
+
+
+abac_permissions := object.union_n([v | v := _abac_permissions[_]])
+
 
 _rbac_permissions[object_permissions] {
 	some assigned_object, _ in user_assignments
@@ -228,6 +238,13 @@ _rebac_permissions[resource] := build_permissions_object(
 	]
 	permissions := roles_permissions(stripped_roles, resource_details)
 }
+
+
+_abac_permissions[p] {
+    input.context.enable_abac_user_permissions
+	p := abac_user_permissions.permissions[_]
+}
+
 
 tenants[tenant] {
 	some assigned_object, _ in user_assignments
