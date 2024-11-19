@@ -2,6 +2,10 @@ package permit.generated.abac.utils
 
 import future.keywords.in
 
+default use_external_data_store := false
+
+use_external_data_store := input.context.use_external_data_store
+
 # not undefined if object 'x' has a key 'k'
 has_key(x, k) {
 	_ := x[k]
@@ -63,6 +67,12 @@ __stored_tenant_attributes = result {
 	result := data.tenants[input.resource.tenant].attributes
 }
 
+# Stored role attributes
+__stored_role_attributes := {role_key: role_attrs |
+	role_key := user_roles[_]
+	role_attrs := data.roles[role_key].attributes
+}
+
 default __input_user_attributes = {}
 
 default __input_resource_attributes = {}
@@ -77,6 +87,8 @@ default __custom_resource_attributes = {}
 
 default __custom_tenant_attributes = {}
 
+default __custom_role_attributes = {}
+
 default __custom_context_attributes = {}
 
 __input_user_attributes = input.user.attributes
@@ -90,6 +102,8 @@ __input_context_attributes = input.context
 __custom_user_attributes = data.permit.custom.custom_user_attributes
 
 __custom_tenant_attributes = data.permit.custom.custom_tenant_attributes
+
+__custom_role_attributes = data.permit.custom.custom_role_attributes
 
 __custom_resource_attributes = data.permit.custom.custom_resource_attributes
 
@@ -118,6 +132,11 @@ __tenant_attributes = object.union_n([
 	__input_tenant_attributes,
 ])
 
+__role_attributes = object.union_n([
+	__stored_role_attributes,
+	__custom_role_attributes,
+])
+
 __context_attributes = object.union(
 	__custom_context_attributes,
 	__input_context_attributes,
@@ -128,6 +147,7 @@ attributes = {
 	"resource": __resource_attributes,
 	"tenant": __tenant_attributes,
 	"context": __context_attributes,
+	"roles": __role_attributes,
 	# TODO: When we want to add data from system, use these
 	#	"resource": object.union(__input_resource_attributes, data.resource[input.resource.id].attributes),
 	#	"environment": object.union(__input_context_environment, data.environment.attributes),

@@ -1,7 +1,18 @@
 package permit.authorized_users
 
 import data.permit.root.debugger_activated
+import data.permit.abac_authorized_users
+
 import future.keywords.in
+
+
+
+_abac_authorized_users[u]:= roles {
+    input.context.enable_abac_authorized_users
+	some u, roles in abac_authorized_users.abac_authorized_users
+}
+
+
 
 format_rbac_assignment(user, role) := {
 	"role": role,
@@ -31,7 +42,7 @@ allowing_action_roles_map[resource_type] := result {
 }
 
 authorized_rbac_users[user] := roles {
-	some _user, user_assignments in data.role_assignments
+	some _user , user_assignments in data.role_assignments
 	tenant_assignments := user_assignments[sprintf("__tenant:%s", [input.resource.tenant])]
 	user := trim_prefix(_user, "user:")
 	roles := {
@@ -68,26 +79,39 @@ get_rbac_user_authorized_roles(user) := roles {
 	roles := set()
 }
 
+get_abac_user_authorized_roles(user) := roles {
+	roles := _abac_authorized_users[user]
+} else = roles {
+	roles := set()
+}
+
+
 object_keys(obj) := result {
 	result := [key | some key, value in obj]
 }
 
 
 _authorized_users[user] := roles {
-	
+
+
+
+
+	abac_users_arr :=  object_keys(_abac_authorized_users)
+	abac_users_set := {x | x := abac_users_arr[_]}
 	rebac_users_arr := object_keys(authorized_rebac_users)
 	rebac_users_set := {x | x := rebac_users_arr[_]}
 	rbac_users_arr := object_keys(authorized_rbac_users)
 	rbac_users_set := {x | x := rbac_users_arr[_]}
-	authorized_users := rebac_users_set | rbac_users_set
+	authorized_users := rebac_users_set | rbac_users_set | abac_users_set
 	
 	some user in authorized_users
 	rebac_assignments := get_rebac_user_authorized_roles(user)
 	rbac_assignments := get_rbac_user_authorized_roles(user)
-	roles := rebac_assignments | rbac_assignments
+	abac_assignments := get_abac_user_authorized_roles(user)
+	roles := rebac_assignments | rbac_assignments | abac_assignments
 }
 
-debug.rbac[user] := debug_output {
+debug_rbac[user] := debug_output {
 	debugger_activated
 	some user, roles in authorized_rbac_users
 	debug_output := {"allowing_roles": {allowing_role: {"reason": reason} |
@@ -100,7 +124,7 @@ debug.rbac[user] := debug_output {
 	}}
 }
 
-debug.rebac[user] := debug_output {
+debug_rebac[user] := debug_output {
 	debugger_activated
 	some user, result in linked_users
 	debug_output := {role: role_debug |
@@ -112,7 +136,7 @@ debug.rebac[user] := debug_output {
 authorized_users_result := {
 	"resource": sprintf("%s:*", [input.resource.type]),
 	"tenant": input.resource.tenant,
-	"users": authorized_rbac_users,
+	"users": _authorized_users,
 } {
 	is_null(object.get(input.resource, "key", null))
 }
@@ -125,8 +149,12 @@ authorized_users_result := {
 	not is_null(object.get(input.resource, "key", null))
 }
 
-authorized_users.debug := debug {
+authorized_users["debug"] := debug {
 	debugger_activated
+	debug := {
+	  "rbac": debug_rbac,
+	  "rebac": debug_rebac,
+	}
 }
 
-authorized_users.result := authorized_users_result
+authorized_users["result"] := authorized_users_result

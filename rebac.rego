@@ -3,7 +3,8 @@ package permit.rebac
 import data.permit.rbac
 import future.keywords.in
 
-
+default use_external_data_store := false
+use_external_data_store := input.context.use_external_data_store
 
 default rebac_roles := []
 
