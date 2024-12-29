@@ -2,9 +2,9 @@ package permit.generated.abac.utils
 
 import future.keywords.in
 
-default use_external_data_store := false
+default use_factdb := false
 
-use_external_data_store := input.context.use_external_data_store
+use_factdb := input.context.use_factdb
 
 # not undefined if object 'x' has a key 'k'
 has_key(x, k) {
@@ -154,4 +154,10 @@ attributes = {
 
 }
 
-condition_set_permissions := data.condition_set_rules
+condition_set_permissions := result {
+	data.condition_set_rules_expand
+	count(data.condition_set_rules_expand) > 0
+	result := data.condition_set_rules_expand
+} else := result {
+	result := data.condition_set_rules
+}

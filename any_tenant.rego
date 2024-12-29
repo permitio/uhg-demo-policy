@@ -3,13 +3,13 @@ package permit.any_tenant
 import data.permit.root
 import future.keywords.in
 
-default use_external_data_store := false
-use_external_data_store := input.context.use_external_data_store
+default use_factdb := false
+use_factdb := input.context.use_factdb
 default is_synced_user := false
 
 
 is_synced_user {
-  use_external_data_store
+  use_factdb
 	data.users[input.user.key]
 }
 

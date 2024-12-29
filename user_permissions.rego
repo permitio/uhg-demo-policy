@@ -162,14 +162,82 @@ default __rebac_roles := {}
 
 
 
-default permissions := {}
 
-permissions := result {
-	result := object.union_n([
-		rbac_permissions,
-		rebac_permissions,
-		abac_permissions,
-	])
+# aggregate all properties with property key 'prop' from object 'obj' with key 'key'
+agg_values(key, obj, prop) := value {
+    value := [p |
+        p := obj[key][prop][_]
+    ]
+}
+
+
+# helper rule to get the related tenant
+get_tenant(key) := result {
+	# if key belong to rbac_permissoins
+    rbac_permissions[key].tenant != null
+    result := rbac_permissions[key].tenant
+} else =  result {
+	# if key belong to abac_permissions
+    abac_permissions[key].tenant != null
+    result := abac_permissions[key].tenant
+} else = result {
+	# if key belong to rebac_permissions
+    rebac_permissions[key].tenant != null
+    result := rebac_permissions[key].tenant
+}
+
+else = result {
+	# if key belong to abac_permissions and the result based on resource instance
+	data.resource_instances[key].tenant != null
+    result := object.union(data.tenants[data.resource_instances[key].tenant], {"key": data.resource_instances[key].tenant, "type": "__tenant"})
+}
+
+
+concat_three_arrays(arr_1,arr_2,arr_3) := result {
+    result := array.concat(array.concat(arr_1, arr_2), arr_3)
+}
+
+# get all the permissions from rbac_permissions, abac_permissions and rebac_permissions and union them but without to override their properties
+# but instead aggregate them (different from rego object.union and object.union_n)
+permissions[key] := result {
+    unique_keys := object.keys(object.union_n([
+        rbac_permissions,
+        rebac_permissions,
+        abac_permissions,
+    ]))
+
+    some key in unique_keys
+	    # aggregate all the common permissions of the key
+        permissions_rbac := agg_values(key,rbac_permissions, "permissions")
+        permissions_abac := agg_values(key,abac_permissions, "permissions")
+        permissions_rebac := agg_values(key,rebac_permissions, "permissions")
+
+		# aggregate all the common roles of the key
+        roles_rbac := agg_values(key,rbac_permissions, "roles")
+        roles_abac := agg_values(key,abac_permissions, "roles")
+        roles_rebac := agg_values(key,rebac_permissions, "roles")
+
+		# generate result with the form {"key" :{ "permissions": aggregated_permissions, "roles": aggregated_roles}, "tenant": related_tenant}
+         _result := {
+			"permissions": concat_three_arrays(permissions_rbac, permissions_abac, permissions_rebac),
+			"roles": concat_three_arrays(roles_rbac, roles_abac, roles_rebac ),
+			"tenant": get_tenant(key)
+		}
+
+		result := object.union(
+			_result,
+			get_resource(key)
+		)
+}
+
+get_resource(key) := result {
+	result := { "resource": rebac_permissions[key].resource}
+} else  := result  {
+	result := { "resource": rbac_permissions[key].resource}
+} else := result  {
+	result := { "resource": abac_permissions[key].resource}
+} else := result {
+	result := {}
 }
 
 default rbac_permissions := {}
@@ -183,7 +251,34 @@ rebac_permissions := object.union_n([v | v := _rebac_permissions[_]])
 default abac_permissions := {}
 
 
-abac_permissions := object.union_n([v | v := _abac_permissions[_]])
+
+
+get_all_abac_permissions(key) := permissions {
+    permissions := {p |
+        some entry in _abac_permissions
+        p := entry[key].permissions[_]
+	}
+}
+
+_abac_permissions_unique_keys := {key: tenant |
+    some obj in _abac_permissions
+        key := object.keys(obj)[_]
+        tenant := obj[key].tenant
+}
+
+
+
+agg_abac_permissions := {result |
+    some key,tenant in _abac_permissions_unique_keys
+        result := {
+			key: {
+				"permissions": get_all_abac_permissions(key),
+				"tenant": tenant
+			}
+		}
+}
+
+abac_permissions := object.union_n([v | v := agg_abac_permissions[_]])
 
 
 _rbac_permissions[object_permissions] {
